@@ -6,6 +6,8 @@ import typing
 import requests
 
 
+__all__ = ["DataPoints", "get_station_data"]
+
 _SESSION = requests.Session()
 
 
@@ -114,28 +116,3 @@ def get_station_data(
         )
 
     return DataPoints(data_points)
-
-
-from elements import Elements
-
-sdate = datetime(2021, 1, 1)
-edate = datetime.today()
-
-dp_iad = get_station_data("IAD", [Elements.SNOW], start_date=sdate, end_date=edate)
-dp_bal = get_station_data("BWI", [Elements.SNOW], start_date=sdate, end_date=edate)
-dp_dca = get_station_data("DCA", [Elements.SNOW], start_date=sdate, end_date=edate)
-
-dp_iad, dp_bal, dp_dca = (
-    dp_iad.filter(lambda data: data.snow >= 1),
-    dp_bal.filter(lambda data: data.snow >= 1),
-    dp_dca.filter(lambda data: data.snow >= 1)
-)
-
-moe = []
-for period, dca_snow in dp_dca.data_points.items():
-    if period not in dp_iad.data_points or period not in dp_bal.data_points:
-        continue
-
-    moe.append((dca_snow.snow / dp_iad.data_points[period].snow + dca_snow.snow / dp_bal.data_points[period].snow) / 2)
-
-print(f"From {sdate.strftime('%B %d, %Y')} to {edate.strftime('%B %d, %Y')}, DCA reported on average {(sum(moe) / len(moe)) * 100:.2f}% of what IAD/BWI measured.")
