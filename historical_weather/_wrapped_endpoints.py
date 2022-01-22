@@ -18,35 +18,51 @@ class DataPoints:
     def filter(
             self,
             condition: typing.Callable,
-            day_difference: typing.Optional[int] = None,
-            until: typing.Optional[int] = None
+            within: typing.Optional[int] = None,
+            min_periods: typing.Optional = None
     ) -> "DataPoints":
         """Filter through each data point in `self.data_points` with the condition provided (callable)"""
 
         filtered = {period: data for period, data in self.data_points.items() if condition(data)}
 
-        if not day_difference:
+        if not within:
             return DataPoints(filtered)
         else:
             all_periods = []
             data_points = {}
+            difference_between_periods = 0
 
             periods_meeting_condition = list(filtered.keys())
 
             for idx, (period, data) in enumerate(filtered.items()):
+                # Skip the first period
                 if idx == 0:
                     continue
 
                 previous_period = periods_meeting_condition[idx - 1]
-                if (period - previous_period).total_seconds() // 86400 <= day_difference:
-                    if periods_meeting_condition[idx - 1] not in data_points:
-                        data_points[previous_period] = filtered[previous_period]
-                    data_points[period] = data
-                elif data_points and len(data_points.keys()) >= until:
-                    all_periods.append(DataPoints(data_points))
-                    data_points = {}
 
-            return all_periods
+                # Ensure that the difference between two periods are within the range (within)
+                if (period - previous_period).total_seconds() // 86400 + difference_between_periods <= within:
+                    if previous_period not in data_points:
+                        data_points[previous_period] = filtered[previous_period]
+
+                    data_points[period] = data
+                else:
+                    # If data_points isn't empty and the range has been exceeded, add it to the list of periods
+                    if data_points:
+                        all_periods.append(DataPoints(data_points))
+                        data_points = {}
+
+                    difference_between_periods = 0
+            else:
+                # If the last period sufficed for the conditions, add it to the periods list
+                if data_points:
+                    all_periods.append(DataPoints(data_points))
+
+            if min_periods:
+                return [period for period in all_periods if len(period.data_points.keys()) >= min_periods]
+            else:
+                return all_periods
 
     def __repr__(self):
         return f"DataPoints({self.data_points})"
@@ -69,6 +85,7 @@ class _Data:
             represent_instance += f"{attr_name}={attr_value}, "
 
         return represent_instance.removesuffix(", ") + ")"
+
 
 def get_station_data(
     station_id: str,
@@ -100,4 +117,8 @@ def get_station_data(
 from elements import Elements
 dp = get_station_data("DCA", [Elements.SNOW], start_date=datetime(1950, 1, 1), end_date=datetime.today())
 
-print(dp.filter(lambda data: data.snow >= 2.6, day_difference=9, until=3))
+lst = dp.filter(lambda data: data.snow >= 2.6, within=13, min_periods=3)
+
+print("[\n\t",end="")
+print(*lst, sep="\n\t")
+print("]")
