@@ -78,7 +78,7 @@ class _Data:
             if value != "T" and value != "M":
                 setattr(self, element.lower(), literal_eval(value))
             else:
-                setattr(self, element.lower(), 0.01 if value == "T" else 0)
+                setattr(self, element.lower(), 0.01 if value == "T" else float("nan"))
 
     def __repr__(self):
         represent_instance = "Data("
@@ -105,7 +105,6 @@ def get_station_data(
     ) if param_value}
 
     response = _SESSION.get("http://data.rcc-acis.org/StnData", params=parameters).json()
-    print(response)
 
     data_points = {}
 
@@ -118,7 +117,25 @@ def get_station_data(
 
 
 from elements import Elements
-dp = get_station_data("SUN64", [Elements.SNOW], start_date=datetime(2008, 12, 1), end_date=datetime(2008, 12, 31))
 
-for key, value in dp.data_points.items():
-    print(f"{key.strftime('%B %d, %Y')} - {value.snow}\"")
+sdate = datetime(2021, 1, 1)
+edate = datetime.today()
+
+dp_iad = get_station_data("IAD", [Elements.SNOW], start_date=sdate, end_date=edate)
+dp_bal = get_station_data("BWI", [Elements.SNOW], start_date=sdate, end_date=edate)
+dp_dca = get_station_data("DCA", [Elements.SNOW], start_date=sdate, end_date=edate)
+
+dp_iad, dp_bal, dp_dca = (
+    dp_iad.filter(lambda data: data.snow >= 1),
+    dp_bal.filter(lambda data: data.snow >= 1),
+    dp_dca.filter(lambda data: data.snow >= 1)
+)
+
+moe = []
+for period, dca_snow in dp_dca.data_points.items():
+    if period not in dp_iad.data_points or period not in dp_bal.data_points:
+        continue
+
+    moe.append((dca_snow.snow / dp_iad.data_points[period].snow + dca_snow.snow / dp_bal.data_points[period].snow) / 2)
+
+print(f"From {sdate.strftime('%B %d, %Y')} to {edate.strftime('%B %d, %Y')}, DCA reported on average {(sum(moe) / len(moe)) * 100:.2f}% of what IAD/BWI measured.")
