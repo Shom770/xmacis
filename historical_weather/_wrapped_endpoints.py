@@ -15,26 +15,38 @@ class DataPoints:
     def __init__(self, data_points: dict):
         self.data_points = data_points
 
-    def filter(self, condition: typing.Callable, day_difference: typing.Union[float, int] = None) -> "DataPoints":
+    def filter(
+            self,
+            condition: typing.Callable,
+            day_difference: typing.Optional[int] = None,
+            until: typing.Optional[int] = None
+    ) -> "DataPoints":
         """Filter through each data point in `self.data_points` with the condition provided (callable)"""
 
-        data_points = {}
+        filtered = {period: data for period, data in self.data_points.items() if condition(data)}
 
-        previous_period = None
+        if not day_difference:
+            return DataPoints(filtered)
+        else:
+            all_periods = []
+            data_points = {}
 
-        for period, data in self.data_points.items():
-            if condition(data):
-                if (
-                        day_difference is not None and previous_period is not None
-                        and (period - previous_period).days >= day_difference
-                ):
-                    previous_period = None
+            periods_meeting_condition = list(filtered.keys())
+
+            for idx, (period, data) in enumerate(filtered.items()):
+                if idx == 0:
                     continue
 
-                data_points[period] = data
-                previous_period = period
+                previous_period = periods_meeting_condition[idx - 1]
+                if (period - previous_period).total_seconds() // 86400 <= day_difference:
+                    if periods_meeting_condition[idx - 1] not in data_points:
+                        data_points[previous_period] = filtered[previous_period]
+                    data_points[period] = data
+                elif data_points and len(data_points.keys()) >= until:
+                    all_periods.append(DataPoints(data_points))
+                    data_points = {}
 
-        return DataPoints(data_points)
+            return all_periods
 
     def __repr__(self):
         return f"DataPoints({self.data_points})"
@@ -48,7 +60,7 @@ class _Data:
             if value != "T" and value != "M":
                 setattr(self, element.lower(), literal_eval(value))
             else:
-                setattr(self, element.lower(), 0.01)
+                setattr(self, element.lower(), 0.01 if value == "T" else 0.1)
 
     def __repr__(self):
         represent_instance = "Data("
@@ -84,5 +96,8 @@ def get_station_data(
 
     return DataPoints(data_points)
 
-dp = get_station_data("DCA", [__import__("elements").Elements.SNOW, __import__("elements").Elements.MAXIMUM_TEMPERATURE], start_date=datetime(1950, 1, 3), end_date=datetime.today())
-print(dp.filter(lambda data: data.snow >= 2.6, day_difference=4))
+
+from elements import Elements
+dp = get_station_data("DCA", [Elements.SNOW], start_date=datetime(1950, 1, 1), end_date=datetime.today())
+
+print(dp.filter(lambda data: data.snow >= 2.6, day_difference=9, until=3))
