@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from ..historical_weather import Elements, get_station_data
+from historical_weather import Elements, get_station_data
 
 dp_iad = get_station_data(
     "IAD",
