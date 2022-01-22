@@ -8,4 +8,3 @@ SNOW_DEPTH = "snwd"
 COOLING_DEG_DAYS = "cdd"
 DAYS_BELOW_BASE = "hdd"
 DAYS_ABOVE_BASE = "gdd"
-
