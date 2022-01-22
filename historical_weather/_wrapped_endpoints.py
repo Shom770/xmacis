@@ -15,10 +15,26 @@ class DataPoints:
     def __init__(self, data_points: dict):
         self.data_points = data_points
 
-    def filter(self, condition: typing.Callable) -> "DataPoints":
+    def filter(self, condition: typing.Callable, day_difference: typing.Union[float, int] = None) -> "DataPoints":
         """Filter through each data point in `self.data_points` with the condition provided (callable)"""
 
-        return DataPoints({period: data for period, data in self.data_points.items() if condition(data)})
+        data_points = {}
+
+        previous_period = None
+
+        for period, data in self.data_points.items():
+            if condition(data):
+                if (
+                        day_difference is not None and previous_period is not None
+                        and (period - previous_period).days >= day_difference
+                ):
+                    previous_period = None
+                    continue
+
+                data_points[period] = data
+                previous_period = period
+
+        return DataPoints(data_points)
 
     def __repr__(self):
         return f"DataPoints({self.data_points})"
@@ -69,4 +85,4 @@ def get_station_data(
     return DataPoints(data_points)
 
 dp = get_station_data("DCA", [__import__("elements").Elements.SNOW, __import__("elements").Elements.MAXIMUM_TEMPERATURE], start_date=datetime(1950, 1, 3), end_date=datetime.today())
-print(dp.filter(lambda data: data.snow >= 2.6))
+print(dp.filter(lambda data: data.snow >= 2.6, day_difference=4))
