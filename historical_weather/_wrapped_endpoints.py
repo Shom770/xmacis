@@ -43,6 +43,8 @@ class DataPoints:
 
                 # Ensure that the difference between two periods are within the range (within)
                 if (period - previous_period).total_seconds() // 86400 + difference_between_periods <= within:
+                    difference_between_periods += (period - previous_period).total_seconds() // 86400
+
                     if previous_period not in data_points:
                         data_points[previous_period] = filtered[previous_period]
 
@@ -76,7 +78,7 @@ class _Data:
             if value != "T" and value != "M":
                 setattr(self, element.lower(), literal_eval(value))
             else:
-                setattr(self, element.lower(), 0.01 if value == "T" else 0.1)
+                setattr(self, element.lower(), 0.01 if value == "T" else 0)
 
     def __repr__(self):
         represent_instance = "Data("
@@ -103,6 +105,7 @@ def get_station_data(
     ) if param_value}
 
     response = _SESSION.get("http://data.rcc-acis.org/StnData", params=parameters).json()
+    print(response)
 
     data_points = {}
 
@@ -115,10 +118,7 @@ def get_station_data(
 
 
 from elements import Elements
-dp = get_station_data("DCA", [Elements.SNOW], start_date=datetime(1950, 1, 1), end_date=datetime.today())
+dp = get_station_data("SUN64", [Elements.SNOW], start_date=datetime(2008, 12, 1), end_date=datetime(2008, 12, 31))
 
-lst = dp.filter(lambda data: data.snow >= 2.6, within=13, min_periods=3)
-
-print("[\n\t",end="")
-print(*lst, sep="\n\t")
-print("]")
+for key, value in dp.data_points.items():
+    print(f"{key.strftime('%B %d, %Y')} - {value.snow}\"")
