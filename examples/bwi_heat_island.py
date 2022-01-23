@@ -40,7 +40,7 @@ differences = heat_island_effects()
 
 formatted_days = list({day.strftime("%B %Y") for day in differences.keys()})
 monthly_difference = [
-    sum((all_deg := [value for key, value in differences.items() if key.month == date.month])) / len(all_deg)
+    sum((all_deg := [value for key, value in differences.items() if key.month == date.month and key.year == date.year])) / len(all_deg)
     for date in differences.keys() if date.day == 1
 ]
 
