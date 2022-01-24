@@ -20,26 +20,30 @@ dp_bwi = get_station_data(
 )
 
 
-def heat_island_effects() -> tuple[float, float, float, float]:
-    """Compares IAD max/min temperature to BWI's and figures out the mean/median of BWI's inaccuracies."""
-    differences = defaultdict(list)
+def heat_island_effects() -> tuple[dict, dict]:
+    """Compares IAD's monthly avg. high temperature to BWI's to see the effects of the heat island at BWI."""
+    average_bwi_high = defaultdict(list)
+    average_iad_high = defaultdict(list)
 
     for day, (iad_data, bwi_data) in zip(
             dp_iad.data_points.keys(), zip(dp_iad.data_points.values(), dp_bwi.data_points.values())
     ):
-        differences[day.strftime("%B %Y")].append((
-            (bwi_data.minimum_temperature - iad_data.minimum_temperature)
-            + (bwi_data.maximum_temperature - iad_data.maximum_temperature)
-        ) / 2)
+        average_bwi_high[day.strftime("%B %Y")].append(bwi_data.maximum_temperature)
+        average_iad_high[day.strftime("%B %Y")].append(iad_data.maximum_temperature)
 
-    return {key: sum(value) / len(value) for key, value in differences.items()}
+    return (
+        {key: sum(value) / len(value) for key, value in average_bwi_high.items()},
+        {key: sum(value) / len(value) for key, value in average_iad_high.items()}
+    )
 
 
-differences = heat_island_effects()
+avg_bwi_high, avg_iad_high = heat_island_effects()
 
-plt.title("BWI's difference from IAD in temperatures monthly on average since January 1st, 2016")
+plt.title("BWI and IAD's monthly average high temperature since January 1st, 2016")
 
-plt.xticks([tick for tick in range(len(differences.keys()))], differences.keys(), rotation=90)
-plt.plot(differences.keys(), differences.values())
+plt.xticks([tick for tick in range(len(avg_bwi_high.keys()))], avg_bwi_high.keys(), rotation=90)
+
+plt.plot(avg_bwi_high.keys(), avg_bwi_high.values(), color="red")
+plt.plot(avg_iad_high.keys(), avg_iad_high.values(), color="blue")
 
 plt.show()
