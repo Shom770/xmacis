@@ -3,6 +3,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 
 from historical_weather import Elements, get_station_data
+import matplotlib.dates as dates
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import make_interp_spline
@@ -40,12 +41,15 @@ def heat_island_effects() -> dict:
 
 differences = heat_island_effects()
 
+departure = np.array(list(differences.values()))
+month_labels = np.array(list(differences.keys()))
+
 plt.title("BWI's difference from IAD in temperatures monthly on average since January 1st, 2016")
 
-plt.xticks([tick for tick in range(len(differences.keys()))], differences.keys(), rotation=90)
-plt.axvline(x=48)  # location of the x value "Jan 2020", i.e. when BWI became a heat island.
+plt.xticks([tick for tick in range(len(month_labels))], month_labels, rotation=90)
+
 plt.axhline(y=0)  # demonstrate how no month average has reached below IAD on average
 
-plt.plot(differences.keys(), differences.values(), color="red")
+plt.scatter(month_labels, departure, color="red")
 
 plt.show()
