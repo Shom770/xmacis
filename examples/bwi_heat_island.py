@@ -4,6 +4,9 @@ from datetime import datetime, timedelta
 
 from historical_weather import Elements, get_station_data
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy.interpolate import make_interp_spline
+
 
 dp_iad = get_station_data(
     "IAD",
