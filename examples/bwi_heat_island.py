@@ -27,7 +27,10 @@ def heat_island_effects() -> dict:
     for day, (iad_data, bwi_data) in zip(
             dp_iad.data_points.keys(), zip(dp_iad.data_points.values(), dp_bwi.data_points.values())
     ):
-        differences[day.strftime("%B %Y")].append(bwi_data)
+        differences[day.strftime("%B %Y")].append((
+            (bwi_data.minimum_temperature - iad_data.minimum_temperature)
+            + (bwi_data.maximum_temperature - iad_data.maximum_temperature)
+        ) / 2)
 
     return {key: sum(value) / len(value) for key, value in differences.items()}
 
