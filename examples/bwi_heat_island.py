@@ -17,7 +17,7 @@ dp_iad = get_station_data(
 )
 
 dp_bwi = get_station_data(
-    "BWI",
+    "DCA",
     [Elements.MINIMUM_TEMPERATURE, Elements.MAXIMUM_TEMPERATURE],
     start_date=datetime(year=2016, month=1, day=1),
     end_date=datetime.today() - timedelta(days=1)
@@ -44,12 +44,13 @@ differences = heat_island_effects()
 departure = np.array(list(differences.values()))
 month_labels = np.array(list(differences.keys()))
 
-plt.title("BWI's difference from IAD in temperatures monthly on average since January 1st, 2016")
+plt.title("DCA's difference from IAD in temperatures monthly on average since January 1st, 2016")
 
 plt.xticks([tick for tick in range(len(month_labels))], month_labels, rotation=90)
 
+plt.axvline(x=48)  # since BWI became a 'heat island'
 plt.axhline(y=0)  # demonstrate how no month average has reached below IAD on average
 
-plt.scatter(month_labels, departure, color="red")
+plt.plot(month_labels, departure, color="red")
 
 plt.show()
