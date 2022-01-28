@@ -17,6 +17,9 @@ class DataPoints:
     def __init__(self, data_points: dict):
         self.data_points = data_points
 
+    def __iter__(self):
+        return self.data_points.items()
+
     def filter(
             self,
             condition: typing.Callable,
