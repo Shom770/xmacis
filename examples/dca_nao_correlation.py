@@ -5,6 +5,7 @@ from historical_weather import Elements, get_station_data, north_american_oscill
 import matplotlib.pyplot as plt
 
 NAO = north_american_oscillation(range(1950, 2022))
+
 snow_events = get_station_data(
     "KDCA",
     [Elements.SNOW],
