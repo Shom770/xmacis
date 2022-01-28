@@ -420,8 +420,7 @@ def arctic_oscillation(year: typing.Optional[typing.Union[range, int]] = None) -
 def north_american_oscillation(year: typing.Optional[typing.Union[range, int]] = None) -> dict:
     """Returns the North American Oscillation index."""
     _nao = {year: [*map(float, line.split()[1:])]
-            for year, line in zip(range(1821, 2022), _AO.split("\n"))}
-
+            for year, line in zip(range(1821, 2022), _NAO.split("\n"))}
     if isinstance(year, range):
         return {year_: _nao[year_] for year_ in year}
     elif isinstance(year, int):
