@@ -9,7 +9,7 @@ snow_events = get_station_data(
     "KDCA",
     [Elements.SNOW],
     start_date=datetime.datetime(year=1950, month=1, day=1),
-    end_date=datetime.today()
+    end_date=datetime.datetime.today()
 ).filter(lambda data: data.snow >= 2)
 
 nao_for_events = []
