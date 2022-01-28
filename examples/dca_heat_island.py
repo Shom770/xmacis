@@ -1,4 +1,4 @@
-"""An analysis comparing daily temperatures between IAD and BWI to see the effect of BWI's 'heat island'."""
+"""An analysis comparing daily temperatures between IAD and DCA to see the effect of DCA's 'heat island'."""
 from collections import defaultdict
 from datetime import datetime, timedelta
 
