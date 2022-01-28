@@ -19,7 +19,7 @@ for date, dca_snow in snow_events.data_points.items():
     nao_for_events.append(NAO[date.year][date.month - 1])
     total_snow.append(dca_snow.snow)
 
-plt.title("Total Snow vs. NAO during that time")
+plt.title("Total Snow for DCA vs. NAO during that time")
 plt.scatter(total_snow, nao_for_events)
 
 plt.show()
