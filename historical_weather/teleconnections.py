@@ -1,3 +1,5 @@
+import typing
+
 _AO = """
 1950 -0.060  0.627 -0.008  0.555  0.072  0.539 -0.802 -0.851  0.358 -0.379 -0.515 -1.928
 1951 -0.085 -0.400 -1.934 -0.776 -0.863 -0.918  0.090 -0.377 -0.818 -0.213 -0.069  1.987
@@ -398,3 +400,29 @@ _PDO = """
 2019     0.66   0.46   0.37   1.07   1.03   1.09   1.03   0.38   0.41  -0.45   0.15   0.97
 2020    -0.23  -0.68  -0.82  -0.57   0.09  -0.08  -0.38  -0.28  -0.70  -0.69  -1.12  -0.90
 2021    -0.16  -0.54  -1.17  -0.91  -0.94  -1.18  -1.87  -1.12  -1.53  -2.55  -2.52   9.90"""
+
+
+def arctic_oscillation(year: typing.Optional[typing.Union[range, int]] = None) -> dict:
+    """Returns the Arctic Oscillation index."""
+    _ao = {year: [*map(float, line.split()[1:])]
+           for year, line in zip(range(1950, 2022), _AO.split("\n"))}
+
+    if isinstance(year, range):
+        return {year_: _ao[year_] for year_ in year}
+    elif isinstance(year, int):
+        return _ao[year]
+    else:
+        return _ao
+
+
+def north_american_oscillation(year: typing.Optional[typing.Union[range, int]] = None) -> dict:
+    """Returns the North American Oscillation index."""
+    _ao = {year: [*map(float, line.split()[1:])]
+           for year, line in zip(range(1950, 2022), _AO.split("\n"))}
+
+    if isinstance(year, range):
+        return {year_: _ao[year_] for year_ in year}
+    elif isinstance(year, int):
+        return _ao[year]
+    else:
+        return _ao
