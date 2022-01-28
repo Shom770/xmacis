@@ -428,3 +428,14 @@ def north_american_oscillation(year: typing.Optional[typing.Union[range, int]] =
         return _nao
 
 
+def pacific_decadal_oscillation(year: typing.Optional[typing.Union[range, int]] = None) -> dict:
+    """Returns the Pacific Decadal Oscillation index."""
+    _pdo = {year: [*map(float, line.split()[1:])]
+            for year, line in zip(range(1950, 2022), _PDO.split("\n"))}
+
+    if isinstance(year, range):
+        return {year_: _pdo[year_] for year_ in year}
+    elif isinstance(year, int):
+        return _pdo[year]
+    else:
+        return _pdo
