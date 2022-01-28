@@ -9,7 +9,7 @@ import numpy as np
 NAO = north_american_oscillation(range(1950, 2022))
 
 snow_events = get_station_data(
-    "KJFK",
+    "KDCA",
     [Elements.SNOW],
     start_date=datetime.datetime(year=1950, month=1, day=1),
     end_date=datetime.datetime(year=2021, month=12, day=31)
@@ -25,7 +25,7 @@ fig, ax = plt.subplots()
 dc_in_snow = ax.imshow(
     dc_in_snow,
     alpha=0.3,
-    extent=[total_snow.min(), total_snow.max(), nao_for_events.min() - 3, nao_for_events.max() + 3]
+    extent=[total_snow.min(), total_snow.max(), nao_for_events.min(), nao_for_events.max()]
 )
 
 plt.title("Total Snow for DCA vs. NAO during that time")
