@@ -15,7 +15,7 @@ snow_events = get_station_data(
 nao_for_events = []
 total_snow = []
 
-for date, dca_snow in dict(snow_events).items():
+for date, dca_snow in snow_events.data_points.items():
     nao_for_events.append(NAO[date.year][date.month - 1])
     total_snow.append(dca_snow.snow)
 
