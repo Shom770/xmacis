@@ -1,6 +1,5 @@
 from ast import literal_eval
 from datetime import datetime
-
 import typing
 
 import requests
@@ -100,13 +99,15 @@ def get_station_data(
     date: typing.Optional[datetime] = None,
 ) -> DataPoints:
     """Retrieves the station data based off the filters provided."""
-    parameters = {param_name: param_value.strftime("%Y-%m-%d") if isinstance(param_value, datetime) else param_value
+    data_to_send = {param_name: param_value.strftime("%Y-%m-%d") if isinstance(param_value, datetime) else param_value
                   for param_name, param_value in zip(
         ("sid", "sdate", "edate", "date", "elems"),
-        (station_id, start_date, end_date, date, ",".join(element.value for element in elements))
+        (station_id, start_date, end_date, date, [
+            element.value if isinstance(element, Elements) else element for element in elements
+        ])
     ) if param_value}
 
-    response = _SESSION.get("http://data.rcc-acis.org/StnData", params=parameters).json()
+    response = _SESSION.post("http://data.rcc-acis.org/StnData", data=data_to_send).json()
 
     data_points = {}
 
