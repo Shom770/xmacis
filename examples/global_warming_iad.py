@@ -25,3 +25,18 @@ def global_warming_effects() -> dict:
         years_and_avg[period.year].append(data.maximum_temperature)
 
     return {key: sum(value) / len(value) for key, value in years_and_avg.items()}
+
+
+global_warming_iad = global_warming_effects()
+
+years = np.array(global_warming_iad.keys())
+avg_high = np.array(global_warming_iad.values())
+
+plt.scatter(years, avg_high)
+
+plt.plot(
+    years,
+    np.poly1d(np.polyfit(years, avg_high, 1))(years),
+    "r--",
+    lw=1
+)
