@@ -29,8 +29,8 @@ def global_warming_effects() -> dict:
 
 global_warming_iad = global_warming_effects()
 
-years = np.array(global_warming_iad.keys())
-avg_high = np.array(global_warming_iad.values())
+years = np.array(list(global_warming_iad.keys()))
+avg_high = np.array(list(global_warming_iad.values()))
 
 plt.scatter(years, avg_high)
 
