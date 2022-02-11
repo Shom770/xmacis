@@ -9,7 +9,7 @@ import numpy as np
 dp_iad = get_station_data(
     "IAD",
     [Elements.MAXIMUM_TEMPERATURE],
-    start_date=datetime(year=1950, month=1, day=1),
+    start_date=datetime(year=1962, month=1, day=1),
     end_date=datetime.today() - timedelta(days=1)
 )
 
@@ -32,7 +32,7 @@ global_warming_iad = global_warming_effects()
 years = np.array(list(global_warming_iad.keys()))
 avg_high = np.array(list(global_warming_iad.values()))
 
-plt.scatter(years, avg_high)
+plt.plot(years, avg_high)
 
 plt.plot(
     years,
