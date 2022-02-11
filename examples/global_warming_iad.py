@@ -32,6 +32,8 @@ global_warming_iad = global_warming_effects()
 years = np.array(list(global_warming_iad.keys()))
 avg_high = np.array(list(global_warming_iad.values()))
 
+plt.title("Average summer high temperature by year since 1962 at IAD")
+
 plt.plot(years, avg_high)
 
 plt.plot(
