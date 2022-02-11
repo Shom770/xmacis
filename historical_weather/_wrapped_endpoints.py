@@ -4,6 +4,8 @@ import typing
 
 import requests
 
+from .elements import Elements
+
 
 __all__ = ["DataPoints", "get_station_data"]
 
