@@ -40,3 +40,5 @@ plt.plot(
     "r--",
     lw=1
 )
+
+plt.show()
