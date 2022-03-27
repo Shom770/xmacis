@@ -119,4 +119,4 @@ legend_labels = {key: value for key, value in {
 
 ax.legend(legend_labels.values(), legend_labels.keys())
 
-plt.show()
+plt.savefig("./iad_tele.png")
