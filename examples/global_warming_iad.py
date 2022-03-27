@@ -19,10 +19,10 @@ def global_warming_effects() -> dict:
     years_and_avg = defaultdict(list)
 
     for period, data in dp_iad.data_points.items():
-        if not datetime(year=period.year, month=6, day=22) <= period < datetime(year=period.year, month=9, day=23):
+        if period.month not in (12, 1, 2, 3):
             continue
 
-        years_and_avg[period.year].append(data.maximum_temperature)
+        years_and_avg[period.year if period.month == 12 else period.year - 1].append(data.maximum_temperature)
 
     return {key: sum(value) / len(value) for key, value in years_and_avg.items()}
 
@@ -32,7 +32,7 @@ global_warming_iad = global_warming_effects()
 years = np.array(list(global_warming_iad.keys()))
 avg_high = np.array(list(global_warming_iad.values()))
 
-plt.title("Average summer high temperature by year since 1962 at IAD")
+plt.title("Average winter high temperature by year since 1962 at IAD")
 
 plt.plot(years, avg_high)
 

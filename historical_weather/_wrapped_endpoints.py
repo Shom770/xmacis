@@ -1,5 +1,6 @@
 from ast import literal_eval
-from datetime import datetime
+from collections import UserDict
+from datetime import datetime, timedelta
 import typing
 
 import requests
@@ -12,11 +13,39 @@ __all__ = ["DataPoints", "get_station_data"]
 _SESSION = requests.Session()
 
 
-class DataPoints:
+class DataPoints(UserDict):
     """Contains all the data recieved from the xmacis API from one request."""
 
     def __init__(self, data_points: dict):
         self.data_points = data_points
+        super().__init__(data_points)
+
+    def combine_storms(self, condition):
+        """Combine days close to each other with associate storms, eg with snow."""
+        dp = {}
+        start_date = None
+        dp_to_add = None
+
+        for period, data in self.data_points.items():
+            if period + timedelta(days=1) not in self.data_points.keys():
+                break
+            elif condition(self.data_points[period + timedelta(days=1)]) and condition(data):
+                if dp_to_add:
+                    dp_to_add += data
+                else:
+                    dp_to_add = data
+                    start_date = period
+            else:
+                if condition(data) and dp_to_add:
+                    dp_to_add += data
+
+                dp[
+                    (start_date, period) if start_date else period
+                ] = dp_to_add if dp_to_add else self.data_points[period]
+                dp_to_add = None
+                start_date = None
+
+        return DataPoints(dp)
 
     def filter(
             self,
@@ -82,6 +111,9 @@ class _Data:
                 setattr(self, element.lower(), literal_eval(value))
             else:
                 setattr(self, element.lower(), 0.01 if value == "T" else float("nan"))
+
+    def __add__(self, other):
+        return _Data(**{name: str(round(value + getattr(other, name), 2)) for name, value in vars(self).items()})
 
     def __repr__(self):
         represent_instance = "Data("
