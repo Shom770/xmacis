@@ -1,2 +1,2 @@
 # xmacis
-An API wrapper for xmacis.
+An API wrapper for xmACIS.
